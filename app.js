@@ -25,7 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // to test response callback in browser
 app.get('/', function(req, res) {
-    res.send('Working');
+    // res.send('Working');
+    res.render('index', {
+        title: 'Home'
+    });
 });
 
 // Start the server
