@@ -23,13 +23,12 @@ app.set('view engine', 'ejs');
 // Set Public folder for Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// to test response callback in browser
-app.get('/', function(req, res) {
-    // res.send('Working');
-    res.render('index', {
-        title: 'Home'
-    });
-});
+// Set routes
+var pages = require('./routes/pages.js');
+var adminPages = require('./routes/admin_pages.js');
+
+app.use('/admin/pages', adminPages);
+app.use('/', pages);
 
 // Start the server
 var port = 3000;
