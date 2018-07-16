@@ -26,6 +26,9 @@ app.set('view engine', 'ejs');
 // Set Public folder for Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Set global errors variable
+app.locals.errors = null;
+
 // Body Parser Middleware
 //
 // parse application/x-www-form-urlencoded
@@ -42,6 +45,7 @@ app.use(session({
 }))
 
 // Express Validator Middleware
+app.use(expressValidator());
 
 // Express Messages Middleware
 app.use(require('connect-flash')());
