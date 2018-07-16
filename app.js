@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var mongoose = require('mongoose');
 var config = require('./config/database');
+var bodyParser = require('body-parser');
+var session = require('express-session');
+var expressValidator = require('express-validator');
 
 // Connect to DB
 mongoose.connect(config.database);
@@ -22,6 +25,30 @@ app.set('view engine', 'ejs');
 
 // Set Public folder for Static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Body Parser Middleware
+//
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}))
+// parse application/json
+app.use(bodyParser.json())
+
+// Express Session Middleware
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+}))
+
+// Express Validator Middleware
+
+// Express Messages Middleware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+    res.locals.messages = require('express-messages')(req, res);
+    next();
+});
 
 // Set routes
 var pages = require('./routes/pages.js');
