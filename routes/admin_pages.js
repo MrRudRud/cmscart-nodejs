@@ -2,6 +2,9 @@
 var express = require('express');
 var router = express.Router();
 
+// Get Page Model
+var Page = require('../models/page');
+
 // GET pages index
 router.get('/', function(req, res) {
     res.send('admin pages baru')
@@ -13,6 +16,7 @@ router.get('/add-page', function(req, res) {
     var slug = "";
     var content = "";
 
+    // render the view
     res.render('admin/add_page', {
         title: title,
         slug: slug,
@@ -43,7 +47,40 @@ router.post('/add-page', function(req, res) {
             content: content
         });
     }else {
-        console.log('Success');
+        Page.findOne({slug: slug}, (err, page) => {
+            // err dan page | page adalah argument untuk err
+            // Kondisi jika slug pada page di MongoDB tidak unik
+            // Page didapat dari import models/page.js yg berisi ketentuan schema collection page pada mongoDB
+            if (page) {
+                req.flash('danger', 'Page slug exists, choose another'); // flash adalah express messages
+                res.render('admin/add_page', {
+                    errors: errors,
+                    title: title,
+                    slug: slug,
+                    content: content
+                });
+            } else {
+                // kondisi jika slug unik maka add page Baru
+                var page = new Page({
+                    //pass an object
+                    title: title,
+                    slug: slug,
+                    content: content,
+                    sorting: 0
+                });
+
+                // Simpan
+                page.save(function(err) {
+                    // jika error maka return ke console sbg error
+                    if (err) return console.log(err);
+                    // jika berhasil imput ke database selain itu return success flash
+                    req.flash('success', 'Page added!');
+                    // kemudian respose dan redirect
+                    res.redirect('/admin/pages');
+                });
+            }
+
+        });
     }
 });
 
