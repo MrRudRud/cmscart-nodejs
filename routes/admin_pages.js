@@ -7,7 +7,15 @@ var Page = require('../models/page');
 
 // GET pages index
 router.get('/', function(req, res) {
-    res.send('admin pages baru')
+    // page.find({}) => find everything on collection MongoDB
+    // sort({sorting: 1}) => sorting secara Ascending
+    // exec to execute callback
+    Page.find({}).sort({sorting: 1}).exec( function(err, pages) {
+        res.render('admin/pages', {
+            pages: pages
+        });
+        // res.send(pages);
+    });
 });
 
 // GET add page
@@ -47,29 +55,28 @@ router.post('/add-page', function(req, res) {
             content: content
         });
     }else {
-        // console.log('save data');
-        Page.findOne({slug: slug}, function(err, page) {
+        Page.findOne({slug: slug}, (err, page) => {
             if(page) {
-                req.flash('danger', 'slug has been found, please change the slug');
+                req.flash('danger', 'slug has been found, please create the new one!');
                 res.render('admin/add_page', {
                     errors: errors,
                     title: title,
-                    slug, slug,
+                    slug: slug,
                     content: content
-                })
+                });
             } else {
                 var page = new Page({
                     title: title,
                     slug: slug,
                     content: content,
-                    sorting: 0
+                    sorting: 100
                 });
 
                 page.save( (err) => {
                     if(err) return console.log(err);
-                    req.flash('data has been saved');
+                    req.flash('success', 'Document has been saved!');
                     res.redirect('/admin/pages');
-                })
+                });
             }
         });
 
