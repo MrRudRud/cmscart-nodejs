@@ -83,6 +83,27 @@ router.post('/add-page', function(req, res) {
     }
 });
 
+// POST reaorder pages 
+router.post('/reorder-pages', function (req, res) {
+    // console.log(req.body);
+    var ids = req.body['id[]']; // tidak bisa req.body.id[], karena id[] adalah string
+    var count = 0;
+
+    for(i = 0; i < ids.length; i++){
+        var id = ids[i];
+        count++;
+
+        (function(count) { // Dari Synchronous ke Asynchronous
+            Page.findById(id, function (err, page) { // Synchronous
+                page.sorting = count;
+                page.save((err) => {
+                    if (err) return console.log(err);
+                });
+            });
+        })(count);
+    }
+});
+
 router.get('/test', function(req, res) {
     res.send('admin test')
 })
