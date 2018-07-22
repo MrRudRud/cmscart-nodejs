@@ -104,6 +104,20 @@ router.post('/reorder-pages', function (req, res) {
     }
 });
 
+// GET edit page
+router.get('/edit-page/:slug', function (req, res) { // slug adalah an arbitrary value
+    // res.send('admin test')
+    Page.findOne({ slug: req.params.slug }, function (err, page) { //req.params.slug -> get from URL
+        if(err) return console.log(err);
+        res.render('admin/edit_page', {
+            title: page.title,
+            slug: page.slug,
+            content: page.content,
+            id: page._id
+        });
+    });
+});
+
 router.get('/test', function(req, res) {
     res.send('admin test')
 })
