@@ -20,7 +20,7 @@
             <% if(page.slug == "home") { %>
                 <td></td>
             <% } else { %>
-            <td><a href="/admin/pages/edit-page/<%= page.slug %>" class="btn btn-danger">Delete</a></td>
+            <td><a href="/admin/pages/delete-page/<%= page._id %>" class="btn btn-danger confirmDeletion">Delete</a></td>
             <% } %>
         </tr>
         <% });%>

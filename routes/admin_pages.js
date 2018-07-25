@@ -172,6 +172,16 @@ router.post('/add-edit', function (req, res) {
     }
 });
 
+// GET Delete page
+router.get('/delete-page/:id', function (req, res) {
+    Page.findByIdAndRemove(req.params.id, function (err) {
+        if (err) return console.log(err);
+        req.flash('success','Page Deleted');
+        res.redirect('/admin/pages/');
+    });
+});
+
+
 router.get('/test', function(req, res) {
     res.send('admin test')
 })
