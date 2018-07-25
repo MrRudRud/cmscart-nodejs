@@ -2,21 +2,17 @@
 var express = require('express');
 var router = express.Router();
 
-// Get Page Model
-var Categories = require('../models/categories');
+// Get Categories Model
+var Category = require('../models/categories');
 
-// GET pages index
+// GET Categories index
 router.get('/', function(req, res) {
-    res.send('cats index');
-    // // page.find({}) => find everything on collection MongoDB
-    // // sort({sorting: 1}) => sorting secara Ascending
-    // // exec to execute callback
-    // Page.find({}).sort({sorting: 1}).exec( function(err, pages) {
-    //     res.render('admin/pages', {
-    //         pages: pages
-    //     });
-    //     // res.send(pages);
-    // });
+    Category.find((err, categories) => {
+        if (err) return console.log(err);
+        res.render('admin/categories', {
+            categories: categories
+        });
+    });
 });
 
 // GET add page

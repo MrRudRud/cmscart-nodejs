@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-// Page Schema
+// Categories Schema
 var CategoriesSchema = mongoose.Schema({
     
     title: {
