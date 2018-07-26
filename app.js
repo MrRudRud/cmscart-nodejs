@@ -6,6 +6,7 @@ var config = require('./config/database');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var expressValidator = require('express-validator');
+var fileUpload = require('express-fileupload');
 
 // Connect to DB
 mongoose.connect(config.database);
@@ -28,6 +29,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set global errors variable
 app.locals.errors = null;
+
+// Express fileUpload middleware
+app.use(fileUpload());
 
 // Body Parser Middleware
 //
@@ -58,7 +62,9 @@ app.use(function (req, res, next) {
 var pages = require('./routes/pages.js');
 var adminPages = require('./routes/admin_pages.js');
 var adminCategories = require('./routes/admin_categories.js');
+var adminProducts = require('./routes/admin_products.js');
 
+app.use('/admin/products', adminProducts);
 app.use('/admin/categories', adminCategories);
 app.use('/admin/pages', adminPages);
 app.use('/', pages);
