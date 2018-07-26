@@ -66,101 +66,68 @@ router.post('/add-categories', function(req, res) {
     }
 });
 
-// POST reaorder pages 
-router.post('/reorder-pages', function (req, res) {
-    // console.log(req.body);
-    var ids = req.body['id[]']; // tidak bisa req.body.id[], karena id[] adalah string
-    var count = 0;
-
-    for(i = 0; i < ids.length; i++){
-        var id = ids[i];
-        count++;
-
-        (function(count) { // Dari Synchronous ke Asynchronous
-            Page.findById(id, function (err, page) { // Synchronous
-                page.sorting = count;
-                page.save((err) => {
-                    if (err) return console.log(err);
-                });
-            });
-        })(count);
-    }
-});
-
-// GET edit page
-router.get('/edit-page/:slug', function (req, res) { // slug adalah an arbitrary value
-    // res.send('admin test')
-    Page.findOne({ slug: req.params.slug }, function (err, page) { //req.params.slug -> get from URL
+// GET edit category
+router.get('/edit-category/:id', function (req, res) {
+    Category.findById(req.params.id, function (err, category) { 
         if(err) return console.log(err);
-        res.render('admin/edit_page', {
-            title: page.title,
-            slug: page.slug,
-            content: page.content,
-            id: page._id
+        res.render('admin/edit_category', {
+            title: category.title,
+            id: category._id
         });
     });
 });
 
-// POST Edit page
-router.post('/add-edit', function (req, res) {
+// POST Edit category
+router.post('/edit-category/:id', function (req, res) {
     // express validation
     req.checkBody('title', 'Title must have a value').notEmpty();
-    req.checkBody('content', 'Content must have a value').notEmpty();
 
     // take all value from input
     var title = req.body.title;
-    var slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    if (slug == "") slug = title.replace(/\s+/g, '-').toLowerCase();
-    var content = req.body.content;
-    var id = req.body.id;
+    var slug = title.replace(/\s+/g, '-').toLowerCase();
+    var id = req.params.id;
 
     var errors = req.validationErrors();
 
     if (errors) {
         console.log('errors');
-        res.render('admin/edit_page', {
+        res.render('admin/edit_category', {
             errors: errors,
             title: title,
-            slug: slug,
-            content: content,
             id: id
         });
     } else {
-        Page.findOne({slug: slug, _id:{'$ne':id}}, (err, page) => {
-            if (page) {
-                req.flash('danger', 'slug has found, please create the new one!');
-                res.render('admin/edit_page', {
+        Category.findOne({slug: slug, _id:{'$ne':id}}, (err, category) => {
+            if (category) {
+                req.flash('danger', 'Category exists, please create the name');
+                res.render('admin/edit_category', {
                     title: title,
                     slug: slug,
-                    content: content,
                     id: id
                 });
             } else {
-                Page.findById(id, function(err, page) {
+                Category.findById(id, function(err, category) {
                     if(err) return console.log(err);
-                    page.title = title;
-                    page.slug = slug;
-                    page.content = content;
+                    category.title = title;
+                    category.slug = slug;
 
-                    page.save((err) => {
+                    category.save((err) => {
                         if (err) return console.log(err);
-                        req.flash('success', 'Document has been saved!');
-                        res.redirect('/admin/pages/edit-page/' + page.slug);
+                        req.flash('success', 'Category has been edited!');
+                        res.redirect('/admin/categories/edit-category/' + id);
                     });
-
                 });
             }
         });
-
     }
 });
 
-// GET Delete page
-router.get('/delete-page/:id', function (req, res) {
-    Page.findByIdAndRemove(req.params.id, function (err) {
+// GET Delete Category
+router.get('/delete-category/:id', function (req, res) {
+    Category.findByIdAndRemove(req.params.id, function (err) {
         if (err) return console.log(err);
-        req.flash('success','Page Deleted');
-        res.redirect('/admin/pages/');
+        req.flash('success',' Category Deleted');
+        res.redirect('/admin/categories/');
     });
 });
 
