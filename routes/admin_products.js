@@ -7,17 +7,21 @@ var resizeImg = require('resize-img');
 
 // Get Product Model
 var Product = require('../models/product');
+// Get Category Model
+var Category = require('../models/categories');
 
-// GET pages index
+// GET product index
 router.get('/', function(req, res) {
-    // page.find({}) => find everything on collection MongoDB
-    // sort({sorting: 1}) => sorting secara Ascending
-    // exec to execute callback
-    Page.find({}).sort({sorting: 1}).exec( function(err, pages) {
-        res.render('admin/pages', {
-            pages: pages
+    var count;
+    Product.count(function(err, c) {
+        count = c;
+    });
+
+    Product.find(function(err, products) {
+        res.render('admin/products', {
+            products: products,
+            count: count
         });
-        // res.send(pages);
     });
 });
 
