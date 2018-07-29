@@ -25,21 +25,23 @@ router.get('/', function(req, res) {
     });
 });
 
-// GET add page
-router.get('/add-page', function(req, res) {
+// GET add product
+router.get('/add-product', function(req, res) {
     var title = "";
-    var slug = "";
-    var content = "";
+    var desc = "";
+    var price = "";
 
-    // render the view
-    res.render('admin/add_page', {
-        title: title,
-        slug: slug,
-        content: content
+    Category.find(function(err, categories) {
+        res.render('admin/add_product', {
+            title: title,
+            desc: desc,
+            categories: categories,
+            price: price
+        });
     });
 });
 
-// POST add page
+// POST add product
 router.post('/add-page', function(req, res) {
     // express validation
     req.checkBody('title', 'Title must have a value').notEmpty();
