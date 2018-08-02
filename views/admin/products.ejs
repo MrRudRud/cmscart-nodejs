@@ -30,7 +30,7 @@
                 <img id="noimage" src="/product_images/<%= product._id %>/<%= product.image %>">
             <% } %>            
             </td>
-            <td><a href="/admin/products/edit-product/<%= product.slug %>" class="btn btn-warning">Edit</a></td>
+            <td><a href="/admin/products/edit-product/<%= product._id %>" class="btn btn-warning">Edit</a></td>
             <td><a href="/admin/products/delete-product/<%= product._id %>" class="btn btn-danger confirmDeletion">Delete</a></td>
         </tr>
         <% });%>

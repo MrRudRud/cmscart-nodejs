@@ -130,16 +130,43 @@ router.post('/add-product', function(req, res) {
     }
 });
 
-// GET edit page
-router.get('/edit-page/:slug', function (req, res) { // slug adalah an arbitrary value
-    // res.send('admin test')
-    Page.findOne({ slug: req.params.slug }, function (err, page) { //req.params.slug -> get from URL
-        if(err) return console.log(err);
-        res.render('admin/edit_page', {
-            title: page.title,
-            slug: page.slug,
-            content: page.content,
-            id: page._id
+// GET edit product
+router.get('/edit-product/:id', function (req, res) { 
+
+    var errors; // an errors array | dont want to display errors code couse too much code
+
+    if (req.session.errors) errors = req.session.errors;
+    req.session.errors = null; // else
+
+    Category.find(function (err, categories) {
+
+        Product.findById(req.params.id, function (err, p) { // find particular product
+            if (err) {
+                console.log(err);
+                res.redirect('/admin/products');
+            } else {
+                var galleryDir = 'public/product_images/' + p._id + '/gallery';
+                var galleryImages = null; // set null to begin
+
+                fs.readdir(galleryDir, function (err, files) { // fs.readdir cek for files
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        galleryImages = files;
+                        res.render('admin/edit_product', {
+                            errors: errors,
+                            title: p.title,
+                            desc: p.desc,
+                            categories: categories,
+                            category: p.category.replace(/\s+/g, '-').toLowerCase(), // as a slug
+                            price: parseFloat(p.price).toFixed(2),
+                            image: p.image,
+                            galleryImages: galleryImages,
+                            id: p._id
+                        });
+                    }
+                });
+            }
         });
     });
 });
