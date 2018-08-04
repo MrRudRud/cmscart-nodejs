@@ -41,7 +41,7 @@
         <div class="form-group">
             <label for="">Upload Image</label>
             <input type="file" class="form-control" name="image" id="img">
-            <img class="noimage" src="/images/noimage.png" id="imgPreview">
+            <img class="noimage" src="/images/noimagepreview.jpg" id="imgPreview">
         </div>
 
         <input type="hidden" name="pimage" value="<%= image %>">
@@ -55,15 +55,21 @@
             <%  if (image != "thumbs") { %>
                 <li>
                     <img src="/product_images/<%= id %>/gallery/thumbs/<%= image %>" alt="">&nbsp;
-                    <a href="/admin/products/delete-image/<%= image %>?id=<%= id %>" class="confimDeletion"></a>
+                    <a class="confirmDeletion btn btn-danger" href="/admin/products/delete-image/<%= image %>?id=<%= id %>" > Delete </a>
                 </li>
             <% } %>
         <% }); %>
     </ul>
 
+    <!-- Dropzone-->
     <br><br>
     <form action="/admin/products/product-gallery/<%= id %>" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+        <div class="fallback">
+            <input type="file" name="file" id="" multiple>
+            <input type="submit" value="Upload">
+        </div>
     </form>
+
     <script>
          // Preview Image
         function readURL(input) {

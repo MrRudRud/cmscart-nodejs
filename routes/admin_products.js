@@ -185,7 +185,6 @@ router.post('/edit-product/:id', function (req, res) {
 
     // take all value from input
     var title = req.body.title;
-    var image = req.body.image;
     var slug = title.replace(/\s+/g, '-').toLowerCase();
     var desc = req.body.desc;
     var price = req.body.price;
@@ -214,7 +213,7 @@ router.post('/edit-product/:id', function (req, res) {
                     p.slug = slug;
                     p.price = parseFloat(price).toFixed(2);
                     p.category = category;
-                    if(image != ""){
+                    if(imageFile != ""){
                         p.image = imageFile;
                     }
 
@@ -227,7 +226,6 @@ router.post('/edit-product/:id', function (req, res) {
                                     if(err) console.log(err);
                                 });
                             }
-
                             //replace image with the new one
                             var productImage = req.files.image;
                             var path = 'public/product_images/' + id + '/' + imageFile;
@@ -237,7 +235,7 @@ router.post('/edit-product/:id', function (req, res) {
                             });
                         }
 
-                        req.flash('success', 'Product added');
+                        req.flash('success', 'Product edited');
                         res.redirect('/admin/products/edit-product/' + id);
                     });
 
@@ -247,6 +245,41 @@ router.post('/edit-product/:id', function (req, res) {
     }
 });
 
+// POST Product Gallery
+router.post('/product-gallery/:id', function (req, res) {
+    // sets variable
+    var productImage = req.files.file;
+    var id = req.params.id;
+    var path = 'public/product_images/' + id + '/gallery/' + req.files.file.name;
+    var thumbsPath = 'public/product_images/' + id + '/gallery/thumbs/' + req.files.file.name;
+
+    productImage.mv(path, function(err) {
+        if(err) console.log(err);
+        resizeImg(fs.readFileSync(path), { width: 100, height: 100 }).then(function (buf) {
+            fs.writeFileSync(thumbsPath, buf);
+        });
+    });
+    res.sendStatus(200);
+});
+
+// GET Delete Image
+router.get('/delete-image/:image', function (req, res) {
+    var originalImage = 'public/product_images/' + req.query.id + '/gallery/' + req.params.image;
+    var thumbImage = 'public/product_images/' + req.query.id + '/gallery/thumbs/' + req.params.image;
+
+    fs.remove(originalImage, function(err) {
+        if(err) console.log(err);
+        else {
+            fs.remove(thumbImage, function(err) {
+                if(err) console.log(err)
+                else {
+                    req.flash('success', 'Image Deleted!');
+                    res.redirect('/admin/products/edit-product/' + req.query.id);
+                };
+            })
+        }
+    });
+});
 // GET Delete page
 router.get('/delete-page/:id', function (req, res) {
     Page.findByIdAndRemove(req.params.id, function (err) {
