@@ -280,13 +280,23 @@ router.get('/delete-image/:image', function (req, res) {
         }
     });
 });
-// GET Delete page
-router.get('/delete-page/:id', function (req, res) {
-    Page.findByIdAndRemove(req.params.id, function (err) {
-        if (err) return console.log(err);
-        req.flash('success','Page Deleted');
-        res.redirect('/admin/pages/');
-    });
+
+// GET Delete Product
+router.get('/delete-product/:id', function (req, res) {
+    // 1. remove folder product_images
+    // 2. remove data dari collection mongoDB
+    var id = req.params.id;
+    var path = 'public/product_images/' + id;
+    fs.remove(path, function(err) {
+        if (err) console.log(err)
+        else {
+            Product.findByIdAndRemove(id, function(err) {
+                console.log(err)
+            });
+            req.flash('success', 'Product Deleted!');
+            res.redirect('/admin/products');
+        }
+     });
 });
 
 
