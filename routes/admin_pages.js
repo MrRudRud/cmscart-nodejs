@@ -76,7 +76,7 @@ router.post('/add-page', function(req, res) {
                     if(err) return console.log(err);
 
                     // CASE 2 : 
-                    // Ketika adding new page header.ejs tidak terupdate 
+                    // Ketika header.ejs tidak terupdate 
                     // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
                     Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
                         if (err) { console.log(err) }
@@ -117,7 +117,7 @@ function sortPages(ids, callback) {
     }
 }
 
-// POST reaorder pages 
+// POST reorder pages 
 router.post('/reorder-pages', function (req, res) {
     // console.log(req.body);
     var ids = req.body['id[]']; // tidak bisa req.body.id[], karena id[] adalah string
@@ -139,16 +139,6 @@ router.get('/edit-page/:slug', function (req, res) { // slug adalah an arbitrary
     // res.send('admin test')
     Page.findOne({ slug: req.params.slug }, function (err, page) { //req.params.slug -> get from URL
         if(err) return console.log(err);
-
-        // CASE 2 : 
-        // Ketika adding new page header.ejs tidak terupdate 
-        // walaupun page sudah direfresh, maka kita perlu MEMANGGIL ULANG SORTING !
-        Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
-            if (err) { console.log(err) }
-            else {
-                req.app.locals.pages = pages;
-            }
-        });
 
         res.render('admin/edit_page', {
             title: page.title,
@@ -204,7 +194,7 @@ router.post('/add-edit', function (req, res) {
                         if (err) return console.log(err);
 
                         // CASE 2 : 
-                        // Ketika adding new page header.ejs tidak terupdate 
+                        // Ketika header.ejs tidak terupdate 
                         // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
                         Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
                             if (err) { console.log(err) }
@@ -230,7 +220,7 @@ router.get('/delete-page/:id', function (req, res) {
         if (err) return console.log(err);
 
         // CASE 2 : 
-        // Ketika adding new page header.ejs tidak terupdate 
+        // Ketika header.ejs tidak terupdate 
         // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
         Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
             if (err) { console.log(err) }
