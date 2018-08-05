@@ -74,6 +74,17 @@ router.post('/add-page', function(req, res) {
 
                 page.save( (err) => {
                     if(err) return console.log(err);
+
+                    // CASE 2 : 
+                    // Ketika adding new page header.ejs tidak terupdate 
+                    // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
+                    Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
+                        if (err) { console.log(err) }
+                        else {
+                            req.app.locals.pages = pages;
+                        }
+                    });
+
                     req.flash('success', 'Document has been saved!');
                     res.redirect('/admin/pages');
                 });
@@ -83,25 +94,44 @@ router.post('/add-page', function(req, res) {
     }
 });
 
-// POST reaorder pages 
-router.post('/reorder-pages', function (req, res) {
-    // console.log(req.body);
-    var ids = req.body['id[]']; // tidak bisa req.body.id[], karena id[] adalah string
+// Sort Pages function
+function sortPages(ids, callback) {
     var count = 0;
 
-    for(i = 0; i < ids.length; i++){
+    for (i = 0; i < ids.length; i++) {
         var id = ids[i];
         count++;
 
-        (function(count) { // Dari Synchronous ke Asynchronous
+        (function (count) { // Dari Synchronous ke Asynchronous
             Page.findById(id, function (err, page) { // Synchronous
                 page.sorting = count;
                 page.save((err) => {
                     if (err) return console.log(err);
+                    ++count;
+                    if(count >= ids.length) {
+                        callback(); // callback becuse that will mean it'sall DONE!
+                    }
                 });
             });
         })(count);
     }
+}
+
+// POST reaorder pages 
+router.post('/reorder-pages', function (req, res) {
+    // console.log(req.body);
+    var ids = req.body['id[]']; // tidak bisa req.body.id[], karena id[] adalah string
+
+    // Make it as a function and callback the function of sortPages
+    sortPages(ids, function() {
+        // Get All pages to pass to header.ejs, Again !!
+        Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
+            if (err) { console.log(err) }
+            else {
+               req.app.locals.pages = pages;
+            }
+        });
+    });
 });
 
 // GET edit page
@@ -109,6 +139,17 @@ router.get('/edit-page/:slug', function (req, res) { // slug adalah an arbitrary
     // res.send('admin test')
     Page.findOne({ slug: req.params.slug }, function (err, page) { //req.params.slug -> get from URL
         if(err) return console.log(err);
+
+        // CASE 2 : 
+        // Ketika adding new page header.ejs tidak terupdate 
+        // walaupun page sudah direfresh, maka kita perlu MEMANGGIL ULANG SORTING !
+        Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
+            if (err) { console.log(err) }
+            else {
+                req.app.locals.pages = pages;
+            }
+        });
+
         res.render('admin/edit_page', {
             title: page.title,
             slug: page.slug,
@@ -161,6 +202,17 @@ router.post('/add-edit', function (req, res) {
 
                     page.save((err) => {
                         if (err) return console.log(err);
+
+                        // CASE 2 : 
+                        // Ketika adding new page header.ejs tidak terupdate 
+                        // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
+                        Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
+                            if (err) { console.log(err) }
+                            else {
+                                req.app.locals.pages = pages;
+                            }
+                        });
+
                         req.flash('success', 'Document has been saved!');
                         res.redirect('/admin/pages/edit-page/' + page.slug);
                     });
@@ -176,6 +228,17 @@ router.post('/add-edit', function (req, res) {
 router.get('/delete-page/:id', function (req, res) {
     Page.findByIdAndRemove(req.params.id, function (err) {
         if (err) return console.log(err);
+
+        // CASE 2 : 
+        // Ketika adding new page header.ejs tidak terupdate 
+        // walaupun page sudah direfresh, maka kita perlu SORTING ULANG !
+        Page.find({}).sort({ sorting: 1 }).exec(function (err, pages) {
+            if (err) { console.log(err) }
+            else {
+                req.app.locals.pages = pages;
+            }
+        });
+
         req.flash('success','Page Deleted');
         res.redirect('/admin/pages/');
     });
